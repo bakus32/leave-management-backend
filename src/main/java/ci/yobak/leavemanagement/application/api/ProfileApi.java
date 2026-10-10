@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController()
 @RequestMapping("/api/{version}/profiles")
@@ -48,8 +52,15 @@ public class ProfileApi {
     @ApiResponse(responseCode = "200", description = "Profiles retrieved successfully",
         content = @Content(schema = @Schema(implementation = ProfileResponseDto.class)))
     @GetMapping(version = "v1")
-    public ResponseEntity<List<ProfileResponseDto>> getAll() {
-        return ResponseEntity.ok(profileApplicationAdapter.getAll());
+    public ResponseEntity<CollectionModel<EntityModel<ProfileResponseDto>>> getAll() {
+        List<ProfileResponseDto> profiles = profileApplicationAdapter.getAll();
+        List<EntityModel<ProfileResponseDto>> profileModels = profiles.stream()
+            .map(p -> EntityModel.of(p,
+                    linkTo(methodOn(ProfileApi.class).getById(p.getId())).withSelfRel(),
+                    linkTo(methodOn(ProfileApi.class).getAll()).withRel("profiles")))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(profileModels,
+                linkTo(methodOn(ProfileApi.class).getAll()).withSelfRel()));
     }
 
     @Operation(summary = "Get profile by id", description = "Fetch a single profile using its identifier.")
@@ -59,8 +70,11 @@ public class ProfileApi {
         @ApiResponse(responseCode = "404", description = "Profile not found")
     })
     @GetMapping(path = "/{id}", version = "v1")
-    public ResponseEntity<ProfileResponseDto> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(profileApplicationAdapter.getById(id));
+    public ResponseEntity<EntityModel<ProfileResponseDto>> getById(@PathVariable Long id) {
+        ProfileResponseDto profile = profileApplicationAdapter.getById(id);
+        return ResponseEntity.ok(EntityModel.of(profile,
+                linkTo(methodOn(ProfileApi.class).getById(id)).withSelfRel(),
+                linkTo(methodOn(ProfileApi.class).getAll()).withRel("profiles")));
     }
 
     @Operation(summary = "Update a profile", description = "Update the code or name of an existing profile.")

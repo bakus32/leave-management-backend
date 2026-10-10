@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/{version}/users")
@@ -48,8 +52,15 @@ public class UserApi {
     @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
         content = @Content(schema = @Schema(implementation = UserResponseDto.class)))
     @GetMapping(version = "v1")
-    public ResponseEntity<List<UserResponseDto>> getAll() {
-        return ResponseEntity.ok(userApplicationAdapter.getAll());
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDto>>> getAll() {
+        List<UserResponseDto> users = userApplicationAdapter.getAll();
+        List<EntityModel<UserResponseDto>> userModels = users.stream()
+            .map(u -> EntityModel.of(u,
+                    linkTo(methodOn(UserApi.class).getById(u.getId())).withSelfRel(),
+                    linkTo(methodOn(UserApi.class).getAll()).withRel("users")))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(userModels,
+                linkTo(methodOn(UserApi.class).getAll()).withSelfRel()));
     }
 
     @Operation(summary = "Get user by id", description = "Fetch a single user by identifier.")
@@ -59,8 +70,11 @@ public class UserApi {
         @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping(path = "/{id}", version = "v1")
-    public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(userApplicationAdapter.getById(id));
+    public ResponseEntity<EntityModel<UserResponseDto>> getById(@PathVariable Long id) {
+        UserResponseDto user = userApplicationAdapter.getById(id);
+        return ResponseEntity.ok(EntityModel.of(user,
+                linkTo(methodOn(UserApi.class).getById(id)).withSelfRel(),
+                linkTo(methodOn(UserApi.class).getAll()).withRel("users")));
     }
 
     @Operation(summary = "Update a user", description = "Update an existing user record and reassociate the profile if needed.")
