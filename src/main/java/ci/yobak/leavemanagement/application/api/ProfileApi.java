@@ -10,22 +10,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController()
 @RequestMapping("/api/{version}/profiles")
@@ -56,7 +51,7 @@ public class ProfileApi {
         List<ProfileResponseDto> profiles = profileApplicationAdapter.getAll();
         List<EntityModel<ProfileResponseDto>> profileModels = profiles.stream()
             .map(p -> EntityModel.of(p,
-                    linkTo(methodOn(ProfileApi.class).getById(p.getId())).withSelfRel(),
+                    linkTo(methodOn(ProfileApi.class).getById(p.id())).withSelfRel(),
                     linkTo(methodOn(ProfileApi.class).getAll()).withRel("profiles")))
             .collect(Collectors.toList());
         return ResponseEntity.ok(CollectionModel.of(profileModels,
@@ -73,7 +68,7 @@ public class ProfileApi {
     public ResponseEntity<EntityModel<ProfileResponseDto>> getById(@PathVariable Long id) {
         ProfileResponseDto profile = profileApplicationAdapter.getById(id);
         return ResponseEntity.ok(EntityModel.of(profile,
-                linkTo(methodOn(ProfileApi.class).getById(id)).withSelfRel(),
+                linkTo(methodOn(ProfileApi.class).getById(profile.id())).withSelfRel(),
                 linkTo(methodOn(ProfileApi.class).getAll()).withRel("profiles")));
     }
 

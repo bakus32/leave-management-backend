@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryAdapter implements UserRepositoryPort {
@@ -43,7 +42,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public List<User> findAll() {
-        return userJpaRepository.findAll().stream().map(mapper::toUser).collect(Collectors.toList());
+        return userJpaRepository.findAll().stream().map(mapper::toUser).toList();
     }
 
     @Override

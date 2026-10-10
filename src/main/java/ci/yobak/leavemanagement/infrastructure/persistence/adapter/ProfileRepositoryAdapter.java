@@ -9,33 +9,32 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class ProfileRepositoryAdapter implements ProfileRepositoryPort {
     private final ProfileRepository profileRepository;
-    private final ProfileMapper mapper;
+    private final ProfileMapper profileMapper;
 
-    public ProfileRepositoryAdapter(ProfileRepository profileRepository, ProfileMapper mapper) {
+    public ProfileRepositoryAdapter(ProfileRepository profileRepository, ProfileMapper profileMapper) {
         this.profileRepository = profileRepository;
-        this.mapper = mapper;
+        this.profileMapper = profileMapper;
     }
 
     @Override
     public Profile save(Profile profile) {
-        ProfileEntity entity = mapper.toProfileEntity(profile);
+        ProfileEntity entity = profileMapper.toProfileEntity(profile);
         ProfileEntity saved = profileRepository.save(entity);
-        return mapper.toProfile(saved);
+        return profileMapper.toProfile(saved);
     }
 
     @Override
     public Optional<Profile> findById(Long id) {
-        return profileRepository.findById(id).map(mapper::toProfile);
+        return profileRepository.findById(id).map(profileMapper::toProfile);
     }
 
     @Override
     public List<Profile> findAll() {
-        return profileRepository.findAll().stream().map(mapper::toProfile).toList();
+        return profileRepository.findAll().stream().map(profileMapper::toProfile).toList();
     }
 
     @Override

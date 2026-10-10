@@ -21,8 +21,8 @@ public class ProfileApplicationAdapter {
 
     public ProfileResponseDto create(PostProfileDto request) {
         Profile profile = new Profile();
-        profile.setCode(request.getCode());
-        profile.setName(request.getName());
+        profile.setCode(request.code());
+        profile.setName(request.name());
         return profileResponseMapper.toResponse(profileUseCase.create(profile));
     }
 
@@ -36,8 +36,8 @@ public class ProfileApplicationAdapter {
 
     public ProfileResponseDto update(Long id, PostProfileDto request) {
         Profile profile = new Profile();
-        profile.setCode(request.getCode());
-        profile.setName(request.getName());
+        profile.setCode(request.code());
+        profile.setName(request.name());
         return profileResponseMapper.toResponse(profileUseCase.update(id, profile));
     }
 
