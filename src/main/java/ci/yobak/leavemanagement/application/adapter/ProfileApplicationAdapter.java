@@ -23,22 +23,22 @@ public class ProfileApplicationAdapter {
         Profile profile = new Profile();
         profile.setCode(request.getCode());
         profile.setName(request.getName());
-        return profileResponseMapper.toResponse(profileUseCase.create(profile));
+        return profileResponseMapper.toProfileDto(profileUseCase.create(profile));
     }
 
     public List<ProfileResponseDto> getAll() {
-        return profileResponseMapper.toResponse(profileUseCase.getAll());
+        return profileResponseMapper.toProfileDto(profileUseCase.getAll());
     }
 
     public ProfileResponseDto getById(Long id) {
-        return profileResponseMapper.toResponse(profileUseCase.getById(id));
+        return profileResponseMapper.toProfileDto(profileUseCase.getById(id));
     }
 
     public ProfileResponseDto update(Long id, PostProfileDto request) {
         Profile profile = new Profile();
         profile.setCode(request.getCode());
         profile.setName(request.getName());
-        return profileResponseMapper.toResponse(profileUseCase.update(id, profile));
+        return profileResponseMapper.toProfileDto(profileUseCase.update(id, profile));
     }
 
     public void delete(Long id) {
