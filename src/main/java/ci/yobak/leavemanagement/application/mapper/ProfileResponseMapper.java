@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProfileResponseMapper {
-    ProfileResponseDto toResponse(Profile profile);
+    ProfileResponseDto toProfileDto(Profile profile);
 
-    List<ProfileResponseDto> toResponse(List<Profile> profiles);
+    List<ProfileResponseDto> toProfileDto(List<Profile> profiles);
 }
